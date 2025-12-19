@@ -1,24 +1,51 @@
 package com.example.myapplication.ui.category
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ViewModelFactory
 import com.example.myapplication.data.Category
@@ -35,11 +62,12 @@ fun CategoryManagerScreen(
     val categories by categoryViewModel.categories.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var newCategoryName by remember { mutableStateOf("") }
+    var editingCategory by remember { mutableStateOf<Category?>(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("分類管理") },
+                title = { Text("Manage categories") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -52,8 +80,12 @@ fun CategoryManagerScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }) {
-                Icon(Icons.Filled.Add, contentDescription = "新增分類")
+            FloatingActionButton(onClick = {
+                editingCategory = null
+                newCategoryName = ""
+                showDialog = true
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = "Add category")
             }
         },
         modifier = Modifier.fillMaxSize()
@@ -69,13 +101,17 @@ fun CategoryManagerScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
-                    Text("現有分類 (${categories.size})", style = MaterialTheme.typography.titleSmall)
+                    Text("Categories (${categories.size})", style = MaterialTheme.typography.titleSmall)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                items(categories) { category ->
+                items(categories, key = { it.id }) { category ->
                     CategoryItem(
                         category = category,
-                        onEditClick = { /* TODO: Implement Edit */ },
+                        onEditClick = {
+                            editingCategory = it
+                            newCategoryName = it.name
+                            showDialog = true
+                        },
                         onDeleteClick = { categoryViewModel.deleteCategory(category.id) }
                     )
                 }
@@ -86,26 +122,32 @@ fun CategoryManagerScreen(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("新增分類") },
+            title = { Text(if (editingCategory == null) "Add category" else "Edit category") },
             text = {
-                TextField(
+                OutlinedTextField(
                     value = newCategoryName,
                     onValueChange = { newCategoryName = it },
-                    label = { Text("分類名稱") }
+                    label = { Text("Category name") },
+                    singleLine = true
                 )
             },
             confirmButton = {
                 Button(onClick = {
-                    categoryViewModel.addCategory(newCategoryName)
+                    if (editingCategory == null) {
+                        categoryViewModel.addCategory(newCategoryName)
+                    } else {
+                        categoryViewModel.updateCategory(editingCategory!!.copy(name = newCategoryName))
+                    }
                     newCategoryName = ""
+                    editingCategory = null
                     showDialog = false
                 }) {
-                    Text("新增")
+                    Text(if (editingCategory == null) "Save" else "Update")
                 }
             },
             dismissButton = {
                 Button(onClick = { showDialog = false }) {
-                    Text("取消")
+                    Text("Cancel")
                 }
             }
         )
@@ -127,12 +169,11 @@ fun CategoryItem(category: Category, onEditClick: (Category) -> Unit, onDeleteCl
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // TODO: Replace with actual category icon
                 Icon(Icons.Filled.Add, contentDescription = "Category Icon", modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(category.name, style = MaterialTheme.typography.titleMedium)
-                    Text("${category.linkCount} 個連結", style = MaterialTheme.typography.bodySmall, color = MutedText)
+                    Text("${category.linkCount} links", style = MaterialTheme.typography.bodySmall, color = MutedText)
                 }
             }
 
@@ -148,11 +189,18 @@ fun CategoryItem(category: Category, onEditClick: (Category) -> Unit, onDeleteCl
     }
 }
 
-
 @Preview(showBackground = true, backgroundColor = 0xFF1A241F)
 @Composable
 fun CategoryManagerScreenPreview() {
     MyApplicationTheme {
-        CategoryManagerScreen(rememberNavController(), categoryViewModel = viewModel(factory = ViewModelFactory(linkRepository = LinkRepository(), linkInfoFetcher = com.example.myapplication.data.LinkInfoFetcher())))
+        CategoryManagerScreen(
+            rememberNavController(),
+            categoryViewModel = viewModel(
+                factory = ViewModelFactory(
+                    linkRepository = LinkRepository(),
+                    linkInfoFetcher = com.example.myapplication.data.LinkInfoFetcher()
+                )
+            )
+        )
     }
 }

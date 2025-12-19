@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class HomeViewModel(private val linkRepository: LinkRepository) : ViewModel() {
     val links: StateFlow<List<Link>> = linkRepository.links
+    val categories = linkRepository.categories
 
     fun toggleFavorite(linkId: String) {
         val current = linkRepository.links.value.firstOrNull { it.id == linkId } ?: return

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.AppDestinations
 import com.example.myapplication.ViewModelFactory
 import com.example.myapplication.data.LinkInfoFetcher
 import com.example.myapplication.data.LinkRepository
@@ -160,7 +161,7 @@ fun AddEditLinkScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Category", style = MaterialTheme.typography.labelMedium)
-                TextButton(onClick = { /* TODO: Navigate to Category Management */ }) {
+                TextButton(onClick = { navController.navigate(AppDestinations.CATEGORY_MANAGER_ROUTE) }) {
                     Text("Manage", color = MaterialTheme.colorScheme.primary)
                 }
             }

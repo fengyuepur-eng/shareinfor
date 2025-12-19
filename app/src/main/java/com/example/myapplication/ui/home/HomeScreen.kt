@@ -3,6 +3,7 @@ package com.example.myapplication.ui.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,15 +40,21 @@ fun HomeScreen(
     homeViewModel: HomeViewModel
 ) {
     val links by homeViewModel.links.collectAsState()
+    val categories by homeViewModel.categories.collectAsState(initial = emptyList())
     var query by rememberSaveable { mutableStateOf("") }
+    var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }
     val filteredLinks = if (query.isBlank()) {
-        links
+        links.filter { link ->
+            selectedCategoryId == null || link.categoryId == selectedCategoryId
+        }
     } else {
         links.filter { link ->
             val haystack = listOfNotNull(link.title, link.description, link.url)
                 .joinToString(" ")
                 .lowercase()
-            haystack.contains(query.lowercase())
+            val matchesQuery = haystack.contains(query.lowercase())
+            val matchesCategory = selectedCategoryId == null || link.categoryId == selectedCategoryId
+            matchesQuery && matchesCategory
         }
     }
 
@@ -81,15 +88,26 @@ fun HomeScreen(
             )
 
             // Filter Chips
-            Row(
+            LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FilterChip(selected = true, onClick = { /*TODO*/ }, label = { Text("All") })
-                FilterChip(selected = false, onClick = { /*TODO*/ }, label = { Text("Favorites") })
-                FilterChip(selected = false, onClick = { /*TODO*/ }, label = { Text("Unread") })
+                item {
+                    FilterChip(
+                        selected = selectedCategoryId == null,
+                        onClick = { selectedCategoryId = null },
+                        label = { Text("All") }
+                    )
+                }
+                items(categories, key = { it.id }) { category ->
+                    FilterChip(
+                        selected = selectedCategoryId == category.id,
+                        onClick = { selectedCategoryId = category.id },
+                        label = { Text(category.name) }
+                    )
+                }
             }
 
             // Link List
