@@ -1,11 +1,15 @@
 package com.example.myapplication.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -16,14 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ViewModelFactory
+import com.example.myapplication.data.Link
 import com.example.myapplication.data.LinkRepository
+import com.example.myapplication.data.LinkInfoFetcher
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = viewModel(factory = ViewModelFactory(linkRepository = LinkRepository()))
+    navController: NavController,
+    homeViewModel: HomeViewModel
 ) {
     val links by homeViewModel.links.collectAsState()
 
@@ -39,7 +48,7 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO: Navigate to Add Link*/ }) {
+            FloatingActionButton(onClick = { navController.navigate("add_edit_link") }) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Link")
             }
         }
@@ -75,7 +84,14 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(links) { link ->
-                    LinkItem(link = link)
+                    Text(
+                        text = link.title ?: "No Title",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                            .padding(16.dp),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }
@@ -86,6 +102,9 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     MyApplicationTheme {
-        HomeScreen()
+        HomeScreen(
+            navController = rememberNavController(),
+            homeViewModel = viewModel(factory = ViewModelFactory(linkRepository = LinkRepository(), linkInfoFetcher = com.example.myapplication.data.LinkInfoFetcher()))
+        )
     }
 }

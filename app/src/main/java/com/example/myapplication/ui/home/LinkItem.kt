@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -53,9 +54,11 @@ fun LinkItem(link: Link) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "A comprehensive guide to the latest shifts in...",
+                        text = link.description ?: "",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MutedText
+                        color = MutedText,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                     IconButton(onClick = { /*TODO*/ }) {
                         Icon(painterResource(id = android.R.drawable.ic_menu_more), contentDescription = "More")
@@ -69,17 +72,51 @@ fun LinkItem(link: Link) {
                  ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         // In a real app, you would resolve the source from the URL
-                        Icon(painterResource(id = android.R.drawable.ic_dialog_info), contentDescription = "Source", modifier = Modifier.size(16.dp))
+                        val source = getSourceFromUrl(link.url)
+                        Icon(painterResource(id = getSourceIcon(source)), contentDescription = "Source", modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Medium", style = MaterialTheme.typography.bodySmall, color = MutedText)
-                        Text(" • 2h ago", style = MaterialTheme.typography.bodySmall, color = MutedText)
+                        Text(source, style = MaterialTheme.typography.bodySmall, color = MutedText)
+                        Text(" • ${getTimeAgo(link.timestamp)}", style = MaterialTheme.typography.bodySmall, color = MutedText)
                     }
                     IconButton(onClick = { /*TODO: Bookmark*/ }) {
-                        Icon(painterResource(id = android.R.drawable.btn_star), contentDescription = "Bookmark")
+                        Icon(painterResource(id = if (link.isFavorite) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off), contentDescription = "Bookmark")
                     }
                  }
             }
         }
+    }
+}
+
+private fun getSourceFromUrl(url: String): String {
+    return try {
+        val host = java.net.URL(url).host
+        host.removePrefix("www.")
+    } catch (e: Exception) {
+        "Unknown source"
+    }
+}
+
+private fun getSourceIcon(source: String): Int {
+    // In a real app, you would have a more sophisticated way of getting icons
+    return when {
+        source.contains("medium.com") -> android.R.drawable.ic_dialog_info
+        source.contains("instagram.com") -> android.R.drawable.ic_media_play
+        else -> android.R.drawable.ic_dialog_map
+    }
+}
+
+private fun getTimeAgo(date: Date): String {
+    val now = System.currentTimeMillis()
+    val diff = now - date.time
+    val seconds = diff / 1000
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    val days = hours / 24
+    return when {
+        days > 0 -> "$days days ago"
+        hours > 0 -> "$hours hours ago"
+        minutes > 0 -> "$minutes minutes ago"
+        else -> "$seconds seconds ago"
     }
 }
 

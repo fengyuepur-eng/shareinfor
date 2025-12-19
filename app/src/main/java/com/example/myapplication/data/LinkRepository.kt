@@ -21,21 +21,28 @@ class LinkRepository {
 
     init {
         // Sample Data
-        val catDesign = _categories.value.first { it.name == "設計靈感" }
-        val catWork = _categories.value.first { it.name == "工作" }
+        val catDesign = _categories.value.find { it.name == "設計靈感" }
+        val catWork = _categories.value.find { it.name == "工作" }
 
-        _links.value = listOf(
-            Link(
-                id = UUID.randomUUID().toString(),
-                url = "https://www.medium.com/design-trends-2024",
-                title = "10 Best UI Design Trends for 2024",
-                description = "A comprehensive guide to the latest shifts in...",
-                imageUrl = "https://i.ibb.co/1n4Y01R/screen.png", // Placeholder image
-                categoryId = catDesign.id,
-                isFavorite = false,
-                isRead = false,
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 2) // 2 hours ago
-            ),
+        val sampleLinks = mutableListOf<Link>()
+        
+        catDesign?.let { category ->
+            sampleLinks.add(
+                Link(
+                    id = UUID.randomUUID().toString(),
+                    url = "https://www.medium.com/design-trends-2024",
+                    title = "10 Best UI Design Trends for 2024",
+                    description = "A comprehensive guide to the latest shifts in...",
+                    imageUrl = "https://i.ibb.co/1n4Y01R/screen.png", // Placeholder image
+                    categoryId = category.id,
+                    isFavorite = false,
+                    isRead = false,
+                    timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 2) // 2 hours ago
+                )
+            )
+        }
+        
+        sampleLinks.add(
             Link(
                 id = UUID.randomUUID().toString(),
                 url = "https://www.instagram.com/p/cat-video",
@@ -46,19 +53,26 @@ class LinkRepository {
                 isFavorite = false,
                 isRead = false,
                 timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24) // Yesterday
-            ),
-            Link(
-                id = UUID.randomUUID().toString(),
-                url = "https://reactnative.dev/docs",
-                title = "React Native Documentation",
-                description = "Core components and APIs...",
-                imageUrl = "https://i.ibb.co/M9q0mP5/screen3.png", // Placeholder image
-                categoryId = catWork.id,
-                isFavorite = true,
-                isRead = true,
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 5) // 5 days ago
             )
         )
+        
+        catWork?.let { category ->
+            sampleLinks.add(
+                Link(
+                    id = UUID.randomUUID().toString(),
+                    url = "https://reactnative.dev/docs",
+                    title = "React Native Documentation",
+                    description = "Core components and APIs...",
+                    imageUrl = "https://i.ibb.co/M9q0mP5/screen3.png", // Placeholder image
+                    categoryId = category.id,
+                    isFavorite = true,
+                    isRead = true,
+                    timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 5) // 5 days ago
+                )
+            )
+        }
+        
+        _links.value = sampleLinks
     }
 
     fun addLink(link: Link) {

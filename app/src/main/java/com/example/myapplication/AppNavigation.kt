@@ -1,43 +1,45 @@
 package com.example.myapplication
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import android.util.Log
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.myapplication.data.LinkRepository
 import com.example.myapplication.ui.addedit.AddEditLinkScreen
+import com.example.myapplication.ui.category.CategoryManagerScreen
 import com.example.myapplication.ui.home.HomeScreen
 
 object AppDestinations {
     const val HOME_ROUTE = "home"
     const val ADD_EDIT_LINK_ROUTE = "add_edit_link"
+    const val CATEGORY_MANAGER_ROUTE = "category_manager"
     const val URL_ARG = "url"
 }
 
 @Composable
 fun AppNavigation(sharedUrl: String?) {
     val navController = rememberNavController()
-    val linkRepository = remember { LinkRepository() }
-
-    val startDestination = if (sharedUrl != null) {
-        "${AppDestinations.ADD_EDIT_LINK_ROUTE}?${AppDestinations.URL_ARG}=$sharedUrl"
-    } else {
-        AppDestinations.HOME_ROUTE
-    }
-
+    val linkRepository = remember { com.example.myapplication.data.LinkRepository() }
+    val linkInfoFetcher = remember { com.example.myapplication.data.LinkInfoFetcher() }
+    
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = AppDestinations.HOME_ROUTE
     ) {
         composable(AppDestinations.HOME_ROUTE) {
             HomeScreen(
+                navController = navController,
                 homeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                    factory = ViewModelFactory(linkRepository = linkRepository)
-                ),
-                navController = navController
+                    factory = ViewModelFactory(linkRepository = linkRepository, linkInfoFetcher = linkInfoFetcher)
+                )
             )
         }
         composable(
@@ -52,10 +54,27 @@ fun AppNavigation(sharedUrl: String?) {
                 viewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                     factory = ViewModelFactory(
                         linkRepository = linkRepository,
+                        linkInfoFetcher = linkInfoFetcher,
                         sharedUrl = backStackEntry.arguments?.getString(AppDestinations.URL_ARG)
                     )
+                ),
+                url = backStackEntry.arguments?.getString(AppDestinations.URL_ARG)
+            )
+        }
+        composable(AppDestinations.CATEGORY_MANAGER_ROUTE) {
+            CategoryManagerScreen(
+                navController = navController,
+                categoryViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                    factory = ViewModelFactory(linkRepository = linkRepository, linkInfoFetcher = linkInfoFetcher)
                 )
             )
+        }
+    }
+    
+    // Handle shared URL navigation after NavHost is ready
+    LaunchedEffect(sharedUrl) {
+        if (!sharedUrl.isNullOrBlank()) {
+            navController.navigate("${AppDestinations.ADD_EDIT_LINK_ROUTE}?${AppDestinations.URL_ARG}=$sharedUrl")
         }
     }
 }

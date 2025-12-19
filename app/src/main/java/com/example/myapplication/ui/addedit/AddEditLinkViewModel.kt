@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Category
 import com.example.myapplication.data.Link
+import com.example.myapplication.data.LinkInfoFetcher
 import com.example.myapplication.data.LinkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,11 +19,13 @@ data class AddEditLinkUiState(
     val description: String = "",
     val selectedCategoryId: String? = null,
     val isFavorite: Boolean = false,
-    val categories: List<Category> = emptyList()
+    val categories: List<Category> = emptyList(),
+    val debugLog: String = ""
 )
 
 class AddEditLinkViewModel(
     private val linkRepository: LinkRepository,
+    private val linkInfoFetcher: LinkInfoFetcher,
     private val sharedUrl: String?
 ) : ViewModel() {
 
@@ -30,21 +33,66 @@ class AddEditLinkViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
-        if (sharedUrl != null) {
-            _uiState.update { it.copy(url = sharedUrl) }
-            onUrlChange(sharedUrl)
-        }
-
+        // Initialize categories
         viewModelScope.launch {
             linkRepository.categories.collect { categories ->
                 _uiState.update { it.copy(categories = categories) }
+            }
+        }
+        
+        // Handle shared URL and fetch metadata
+        sharedUrl?.let { url ->
+            if (url.isNotBlank()) {
+                _uiState.update { it.copy(url = url) }
+                
+                // Auto-fetch metadata for shared URL
+                viewModelScope.launch {
+                    try {
+                        val metadata = linkInfoFetcher.fetchLinkMetadata(url)
+                        _uiState.update {
+                            it.copy(
+                                title = metadata?.title ?: "",
+                                description = metadata?.description ?: ""
+                            )
+                        }
+                    } catch (e: Exception) {
+                        _uiState.update {
+                            it.copy(
+                                debugLog = "Error fetching metadata: ${e.message}"
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 
     fun onUrlChange(newUrl: String) {
         _uiState.update { it.copy(url = newUrl) }
-        // TODO: Add logic to auto-fetch link metadata
+        
+        // Auto-fetch link metadata when URL is provided
+        if (newUrl.isNotBlank()) {
+            viewModelScope.launch {
+                try {
+                    val metadata = linkInfoFetcher.fetchLinkMetadata(newUrl)
+                    if (metadata != null) {
+                        _uiState.update {
+                            it.copy(
+                                title = metadata.title ?: it.title,
+                                description = metadata.description ?: it.description
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    // If fetching fails, at least we have the URL
+                    _uiState.update {
+                        it.copy(
+                            debugLog = "Error fetching metadata: ${e.message}"
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun onTitleChange(newTitle: String) {

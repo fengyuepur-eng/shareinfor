@@ -13,7 +13,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ViewModelFactory
+import com.example.myapplication.data.LinkInfoFetcher
 import com.example.myapplication.data.LinkRepository
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.ui.theme.MutedText
@@ -27,9 +30,7 @@ fun AddEditLinkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    if (url != null) {
-        viewModel.onUrlChange(url)
-    }
+    
 
     Scaffold(
         topBar = {
@@ -37,7 +38,7 @@ fun AddEditLinkScreen(
                 title = { Text("新增連結") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -188,6 +189,14 @@ fun AddEditLinkScreen(
 @Composable
 fun AddEditLinkScreenPreview() {
     MyApplicationTheme {
-        AddEditLinkScreen(navController = rememberNavController(), viewModel = viewModel(factory = ViewModelFactory(linkRepository = LinkRepository())))
+        AddEditLinkScreen(
+            navController = rememberNavController(),
+            viewModel = viewModel(
+                factory = ViewModelFactory(
+                    linkRepository = LinkRepository(),
+                    linkInfoFetcher = com.example.myapplication.data.LinkInfoFetcher()
+                )
+            )
+        )
     }
 }
