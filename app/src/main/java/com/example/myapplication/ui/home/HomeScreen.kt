@@ -64,7 +64,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Links") },
+                title = { Text("Share2 My Links") },
                 actions = {
                     IconButton(onClick = { navController.navigate(AppDestinations.CATEGORY_MANAGER_ROUTE) }) {
                         Icon(Icons.Filled.Settings, contentDescription = "Manage categories")
