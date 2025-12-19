@@ -1,0 +1,79 @@
+2025-12-19 15:09:31.471  9229-9229  VRI[MainAc...y]@c0a51bb com.example.myapplication            I  Creating new active sync group VRI[MainActivity]@c0a51bb#1
+2025-12-19 15:09:31.471  9229-9229  VRI[MainAc...y]@c0a51bb com.example.myapplication            D  registerCallbacksForSync syncBuffer=false
+2025-12-19 15:09:31.488  9229-9267  VRI[MainAc...y]@c0a51bb com.example.myapplication            D  Received frameDrawingCallback syncResult=0 frameNum=1.
+2025-12-19 15:09:31.489  9229-9267  VRI[MainAc...y]@c0a51bb com.example.myapplication            I  mWNT: t=0xb4000077c2d1b290 mBlastBufferQueue=0xb400007762d49560 fn= 1 HdrRenderState mRenderHdrSdrRatio=1.0 caller= android.view.ViewRootImpl$12.onFrameDraw:15441 android.view.ThreadedRenderer$1.onFrameDraw:718 <bottom of call stack> 
+2025-12-19 15:09:31.489  9229-9267  VRI[MainAc...y]@c0a51bb com.example.myapplication            I  Setting up sync and frameCommitCallback
+2025-12-19 15:09:31.516  9229-9279  AndroidRuntime          com.example.myapplication            E  FATAL EXCEPTION: OkHttp Dispatcher
+                                                                                                    Process: com.example.myapplication, PID: 9229
+                                                                                                    java.lang.SecurityException: Permission denied (missing INTERNET permission?)
+                                                                                                    	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:150)
+                                                                                                    	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+                                                                                                    	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+                                                                                                    	at okhttp3.Dns$Companion$DnsSystem.lookup(Dns.kt:49)
+                                                                                                    	at okhttp3.internal.connection.RouteSelector.resetNextInetSocketAddress(RouteSelector.kt:169)
+                                                                                                    	at okhttp3.internal.connection.RouteSelector.nextProxy(RouteSelector.kt:131)
+                                                                                                    	at okhttp3.internal.connection.RouteSelector.next(RouteSelector.kt:73)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:205)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+                                                                                                    	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+                                                                                                    	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+                                                                                                    	at java.lang.Thread.run(Thread.java:1119)
+                                                                                                    Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+                                                                                                    	at libcore.io.Linux.android_getaddrinfo(Native Method)
+                                                                                                    	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+                                                                                                    	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+                                                                                                    	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+                                                                                                    	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+                                                                                                    	... 23 more
+                                                                                                    Caused by: android.system.ErrnoException: android_getaddrinfo failed: EPERM (Operation not permitted)
+                                                                                                    	... 28 more
+2025-12-19 15:09:31.517  9229-9280  AndroidRuntime          com.example.myapplication            E  FATAL EXCEPTION: OkHttp Dispatcher
+                                                                                                    Process: com.example.myapplication, PID: 9229
+                                                                                                    java.lang.SecurityException: Permission denied (missing INTERNET permission?)
+                                                                                                    	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:150)
+                                                                                                    	at java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:103)
+                                                                                                    	at java.net.InetAddress.getAllByName(InetAddress.java:1152)
+                                                                                                    	at okhttp3.Dns$Companion$DnsSystem.lookup(Dns.kt:49)
+                                                                                                    	at okhttp3.internal.connection.RouteSelector.resetNextInetSocketAddress(RouteSelector.kt:169)
+                                                                                                    	at okhttp3.internal.connection.RouteSelector.nextProxy(RouteSelector.kt:131)
+                                                                                                    	at okhttp3.internal.connection.RouteSelector.next(RouteSelector.kt:73)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:205)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:517)
+                                                                                                    	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1156)
+                                                                                                    	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:651)
+                                                                                                    	at java.lang.Thread.run(Thread.java:1119)
+                                                                                                    Caused by: android.system.GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+                                                                                                    	at libcore.io.Linux.android_getaddrinfo(Native Method)
+                                                                                                    	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+                                                                                                    	at libcore.io.BlockGuardOs.android_getaddrinfo(BlockGuardOs.java:222)
+                                                                                                    	at libcore.io.ForwardingOs.android_getaddrinfo(ForwardingOs.java:133)
+                                                                                                    	at java.net.Inet6AddressImpl.lookupHostByName(Inet6AddressImpl.java:135)
+                                                                                                    	... 23 more
+                                                                                                    Caused by: android.system.ErrnoException: android_getaddrinfo failed: EPERM (Operation not permitted)
+                                                                                                    	... 28 more
+2025-12-19 15:09:31.517  9229-9280  Process                 com.example.myapplication            I  Sending signal. PID: 9229 SIG: 9
+2025-12-19 15:09:31.534  2732-3661  InputDispatcher         system_server                        E  channel 'b3b9d32 com.example.myapplication/com.example.myapplication.MainActivity' ~ Channel is unrecoverably broken and will be disposed!

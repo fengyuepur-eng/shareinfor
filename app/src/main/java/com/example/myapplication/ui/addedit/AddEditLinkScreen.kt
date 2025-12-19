@@ -1,15 +1,40 @@
 package com.example.myapplication.ui.addedit
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,13 +54,12 @@ fun AddEditLinkScreen(
     url: String? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
-    
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("新增連結") },
+                title = { Text("Add link") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -47,22 +71,50 @@ fun AddEditLinkScreen(
                 )
             )
         },
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Text("Cancel")
+                }
+                Button(
+                    onClick = {
+                        viewModel.saveLink()
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Save")
+                }
+            }
+        },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
-                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // URL Field
-            Text("連結網址", style = MaterialTheme.typography.labelMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text("URL", style = MaterialTheme.typography.labelMedium)
             OutlinedTextField(
                 value = uiState.url,
                 onValueChange = viewModel::onUrlChange,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                placeholder = { Text("Paste a link") },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.surface,
@@ -70,19 +122,15 @@ fun AddEditLinkScreen(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 )
             )
-            Text("✓ 已自動擷取網站資訊", color = Color.Green, style = MaterialTheme.typography.labelSmall)
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Title Field
-            Text("標題", style = MaterialTheme.typography.labelMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text("Title", style = MaterialTheme.typography.labelMedium)
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = viewModel::onTitleChange,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                 colors = OutlinedTextFieldDefaults.colors(
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.surface,
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -90,11 +138,7 @@ fun AddEditLinkScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Description Field
-            Text("描述", style = MaterialTheme.typography.labelMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text("Description", style = MaterialTheme.typography.labelMedium)
             OutlinedTextField(
                 value = uiState.description,
                 onValueChange = viewModel::onDescriptionChange,
@@ -110,33 +154,26 @@ fun AddEditLinkScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Category Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("分類", style = MaterialTheme.typography.labelMedium)
+                Text("Category", style = MaterialTheme.typography.labelMedium)
                 TextButton(onClick = { /* TODO: Navigate to Category Management */ }) {
-                    Text("管理分類", color = MaterialTheme.colorScheme.primary)
+                    Text("Manage", color = MaterialTheme.colorScheme.primary)
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 uiState.categories.forEach { category ->
-                     FilterChip(
-                         selected = uiState.selectedCategoryId == category.id,
-                         onClick = { viewModel.onCategorySelected(category.id) },
-                         label = { Text(category.name) }
-                     )
+                    FilterChip(
+                        selected = uiState.selectedCategoryId == category.id,
+                        onClick = { viewModel.onCategorySelected(category.id) },
+                        label = { Text(category.name) }
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Favorite Section
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -146,8 +183,12 @@ fun AddEditLinkScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("❤️ 加入最愛")
-                    Text("顯示在最愛列表頂部", style = MaterialTheme.typography.bodySmall, color = MutedText)
+                    Text("Pin to favorites", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        "Show in favorite filter and surface it later",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MutedText
+                    )
                 }
                 Switch(
                     checked = uiState.isFavorite,
@@ -155,32 +196,7 @@ fun AddEditLinkScreen(
                 )
             }
 
-            Spacer(Modifier.weight(1f)) // Pushes content below to the bottom
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f).padding(end = 8.dp),
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Text("取消")
-                }
-                Button(
-                    onClick = {
-                        viewModel.saveLink()
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier.weight(1f).padding(start = 8.dp),
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("儲存變更 ✓")
-                }
-            }
+            Spacer(modifier = Modifier.height(80.dp)) // leave space above bottom buttons
         }
     }
 }
@@ -194,7 +210,7 @@ fun AddEditLinkScreenPreview() {
             viewModel = viewModel(
                 factory = ViewModelFactory(
                     linkRepository = LinkRepository(),
-                    linkInfoFetcher = com.example.myapplication.data.LinkInfoFetcher()
+                    linkInfoFetcher = LinkInfoFetcher()
                 )
             )
         )

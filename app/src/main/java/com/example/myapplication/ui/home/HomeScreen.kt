@@ -16,12 +16,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.AppDestinations
 import com.example.myapplication.ViewModelFactory
 import com.example.myapplication.data.Link
 import com.example.myapplication.data.LinkRepository
@@ -35,6 +39,17 @@ fun HomeScreen(
     homeViewModel: HomeViewModel
 ) {
     val links by homeViewModel.links.collectAsState()
+    var query by rememberSaveable { mutableStateOf("") }
+    val filteredLinks = if (query.isBlank()) {
+        links
+    } else {
+        links.filter { link ->
+            val haystack = listOfNotNull(link.title, link.description, link.url)
+                .joinToString(" ")
+                .lowercase()
+            haystack.contains(query.lowercase())
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -56,8 +71,8 @@ fun HomeScreen(
         Column(modifier = Modifier.padding(innerPadding)) {
             // Search Bar
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = query,
+                onValueChange = { query = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
@@ -83,14 +98,15 @@ fun HomeScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(links) { link ->
-                    Text(
-                        text = link.title ?: "No Title",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
-                            .padding(16.dp),
-                        style = MaterialTheme.typography.bodyLarge
+                items(filteredLinks, key = { it.id }) { link ->
+                    LinkItem(
+                        link = link,
+                        onClick = {
+                            navController.navigate("${AppDestinations.LINK_DETAIL_ROUTE}/${link.id}")
+                        },
+                        onFavoriteToggle = {
+                            homeViewModel.toggleFavorite(link.id)
+                        }
                     )
                 }
             }

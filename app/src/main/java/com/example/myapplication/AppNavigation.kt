@@ -16,12 +16,15 @@ import androidx.navigation.navArgument
 import com.example.myapplication.ui.addedit.AddEditLinkScreen
 import com.example.myapplication.ui.category.CategoryManagerScreen
 import com.example.myapplication.ui.home.HomeScreen
+import com.example.myapplication.ui.home.LinkDetailScreen
 
 object AppDestinations {
     const val HOME_ROUTE = "home"
     const val ADD_EDIT_LINK_ROUTE = "add_edit_link"
     const val CATEGORY_MANAGER_ROUTE = "category_manager"
+    const val LINK_DETAIL_ROUTE = "link_detail"
     const val URL_ARG = "url"
+    const val LINK_ID_ARG = "linkId"
 }
 
 @Composable
@@ -68,6 +71,23 @@ fun AppNavigation(sharedUrl: String?) {
                     factory = ViewModelFactory(linkRepository = linkRepository, linkInfoFetcher = linkInfoFetcher)
                 )
             )
+        }
+        composable(
+            route = "${AppDestinations.LINK_DETAIL_ROUTE}/{${AppDestinations.LINK_ID_ARG}}",
+            arguments = listOf(navArgument(AppDestinations.LINK_ID_ARG) {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
+            val linkId = backStackEntry.arguments?.getString(AppDestinations.LINK_ID_ARG)
+            if (linkId != null) {
+                LinkDetailScreen(
+                    navController = navController,
+                    linkId = linkId,
+                    linkRepository = linkRepository
+                )
+            } else {
+                navController.popBackStack()
+            }
         }
     }
     
