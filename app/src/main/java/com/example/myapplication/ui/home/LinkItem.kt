@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +70,11 @@ fun LinkItem(
                     Text(" · ${getTimeAgo(link.timestamp)}", style = MaterialTheme.typography.bodySmall, color = MutedText)
                 }
                 IconButton(onClick = onFavoriteToggle) {
-                    Icon(painterResource(id = if (link.isFavorite) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off), contentDescription = "Bookmark")
+                    Icon(
+                        painterResource(id = if (link.isFavorite) android.R.drawable.btn_star_big_on else android.R.drawable.btn_star_big_off),
+                        contentDescription = "Bookmark",
+                        tint = if (link.isFavorite) MaterialTheme.colorScheme.primary else Color.Gray
+                    )
                 }
             }
         }

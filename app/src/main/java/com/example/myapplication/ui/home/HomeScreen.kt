@@ -43,7 +43,7 @@ fun HomeScreen(
     val categories by homeViewModel.categories.collectAsState(initial = emptyList())
     var query by rememberSaveable { mutableStateOf("") }
     var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }
-    val filteredLinks = if (query.isBlank()) {
+    val filteredLinks = (if (query.isBlank()) {
         links.filter { link ->
             selectedCategoryId == null || link.categoryId == selectedCategoryId
         }
@@ -56,15 +56,18 @@ fun HomeScreen(
             val matchesCategory = selectedCategoryId == null || link.categoryId == selectedCategoryId
             matchesQuery && matchesCategory
         }
-    }
+    }).sortedWith(
+        compareByDescending<Link> { it.isFavorite }
+            .thenByDescending { it.timestamp.time }
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("My Links") },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                    IconButton(onClick = { navController.navigate(AppDestinations.CATEGORY_MANAGER_ROUTE) }) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Manage categories")
                     }
                 }
             )
