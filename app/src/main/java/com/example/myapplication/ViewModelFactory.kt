@@ -11,13 +11,19 @@ import com.example.myapplication.ui.home.HomeViewModel
 class ViewModelFactory(
     private val linkRepository: LinkRepository,
     private val linkInfoFetcher: LinkInfoFetcher,
-    private val sharedUrl: String? = null
+    private val sharedUrl: String? = null,
+    private val editingLinkId: String? = null
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AddEditLinkViewModel::class.java)) {
-            return AddEditLinkViewModel(linkRepository, linkInfoFetcher, sharedUrl) as T
+            return AddEditLinkViewModel(
+                linkRepository = linkRepository,
+                linkInfoFetcher = linkInfoFetcher,
+                sharedUrl = sharedUrl,
+                editingLinkId = editingLinkId
+            ) as T
         }
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
             return HomeViewModel(linkRepository) as T

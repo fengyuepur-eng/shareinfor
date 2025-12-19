@@ -46,19 +46,29 @@ fun AppNavigation(sharedUrl: String?) {
             )
         }
         composable(
-            route = "${AppDestinations.ADD_EDIT_LINK_ROUTE}?${AppDestinations.URL_ARG}={${AppDestinations.URL_ARG}}",
-            arguments = listOf(navArgument(AppDestinations.URL_ARG) {
-                type = NavType.StringType
-                nullable = true
-            })
+            route = "${AppDestinations.ADD_EDIT_LINK_ROUTE}?${AppDestinations.URL_ARG}={${AppDestinations.URL_ARG}}&${AppDestinations.LINK_ID_ARG}={${AppDestinations.LINK_ID_ARG}}",
+            arguments = listOf(
+                navArgument(AppDestinations.URL_ARG) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument(AppDestinations.LINK_ID_ARG) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
         ) { backStackEntry ->
+            val linkIdArg = backStackEntry.arguments?.getString(AppDestinations.LINK_ID_ARG)
             AddEditLinkScreen(
                 navController = navController,
                 viewModel = androidx.lifecycle.viewmodel.compose.viewModel(
                     factory = ViewModelFactory(
                         linkRepository = linkRepository,
                         linkInfoFetcher = linkInfoFetcher,
-                        sharedUrl = backStackEntry.arguments?.getString(AppDestinations.URL_ARG)
+                        sharedUrl = backStackEntry.arguments?.getString(AppDestinations.URL_ARG),
+                        editingLinkId = linkIdArg
                     )
                 ),
                 url = backStackEntry.arguments?.getString(AppDestinations.URL_ARG)

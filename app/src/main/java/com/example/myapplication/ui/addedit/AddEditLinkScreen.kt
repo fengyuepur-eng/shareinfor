@@ -59,7 +59,7 @@ fun AddEditLinkScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add link") },
+                title = { Text(if (uiState.isEdit) "Edit link" else "Add link") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
