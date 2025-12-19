@@ -47,6 +47,9 @@ fun LinkDetailScreen(
 ) {
     val links by linkRepository.links.collectAsState()
     val link = links.firstOrNull { it.id == linkId }
+    val categoryName = linkRepository.categories.value
+        .firstOrNull { it.id == link?.categoryId }
+        ?.name ?: "Uncategorized"
 
     val context = LocalContext.current
 
@@ -79,7 +82,7 @@ fun LinkDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(link.title?.ifBlank { "Link details" } ?: "Link details") },
+                title = { Text(link.title?.ifBlank { "Link details" } ?: "Link details", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -124,30 +127,48 @@ fun LinkDetailScreen(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
                         text = link.title?.ifBlank { "Untitled" } ?: "Untitled",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(
-                        text = "Added: ${DateFormat.getDateTimeInstance().format(link.timestamp)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = link.url,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleLarge,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            text = "Category • $categoryName",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Added • ${DateFormat.getDateTimeInstance().format(link.timestamp)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = link.url,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
 
-            Text(
-                text = link.description?.ifBlank { "No description" } ?: "No description",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Notes", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = link.description?.ifBlank { "No description" } ?: "No description",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
         }
     }
 }
